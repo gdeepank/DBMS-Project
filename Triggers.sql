@@ -1,0 +1,16 @@
+DROP TABLE AUDIT;
+
+CREATE TABLE AUDIT(
+   STU_ID VARCHAR(9),
+   ENTRY_DATE TEXT NOT NULL
+);
+
+CREATE OR REPLACE FUNCTION auditlogfunc() RETURNS TRIGGER AS $log_table$
+   BEGIN
+      INSERT INTO AUDIT(STU_ID, ENTRY_DATE) VALUES (new.student_id, current_timestamp);
+      RETURN NEW;
+   END;
+$log_table$ LANGUAGE plpgsql;
+
+CREATE TRIGGER logs AFTER INSERT ON students
+FOR EACH ROW EXECUTE PROCEDURE auditlogfunc();
